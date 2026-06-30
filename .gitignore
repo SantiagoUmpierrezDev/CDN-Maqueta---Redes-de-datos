@@ -1,0 +1,6 @@
+# Archivos HLS generados (pueden ser pesados)
+origen/video/*.ts
+origen/video/*.m3u8
+
+# Mantener la carpeta en el repo
+!origen/video/.gitkeep
