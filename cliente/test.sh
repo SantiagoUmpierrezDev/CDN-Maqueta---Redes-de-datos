@@ -14,15 +14,16 @@ fi
 URL="http://$IP_EDGE/video/index.m3u8"
 
 echo "======================================="
-echo "  CDN Maqueta - Test de caché"
+echo "  CDN Maqueta - Test de cache"
 echo "======================================="
 echo "Edge server: $IP_EDGE"
 echo "URL: $URL"
 echo ""
 
 echo "--- Solicitud 1 (esperado: MISS) ---"
-TIME1=$(curl -o /dev/null -s -w "%{time_total}" -I "$URL" | tail -1)
-STATUS1=$(curl -s -I "$URL" | grep -i "x-cache-status" | tr -d '\r')
+RESPONSE1=$(curl -s -o /dev/null -w "%{time_total}|%header{x-cache-status}" -I "$URL")
+TIME1=$(echo $RESPONSE1 | cut -d'|' -f1)
+STATUS1=$(echo $RESPONSE1 | cut -d'|' -f2)
 echo "X-Cache-Status: $STATUS1"
 echo "Tiempo: ${TIME1}s"
 echo ""
@@ -30,8 +31,9 @@ echo ""
 sleep 1
 
 echo "--- Solicitud 2 (esperado: HIT) ---"
-TIME2=$(curl -o /dev/null -s -w "%{time_total}" -I "$URL" | tail -1)
-STATUS2=$(curl -s -I "$URL" | grep -i "x-cache-status" | tr -d '\r')
+RESPONSE2=$(curl -s -o /dev/null -w "%{time_total}|%header{x-cache-status}" -I "$URL")
+TIME2=$(echo $RESPONSE2 | cut -d'|' -f1)
+STATUS2=$(echo $RESPONSE2 | cut -d'|' -f2)
 echo "X-Cache-Status: $STATUS2"
 echo "Tiempo: ${TIME2}s"
 echo ""
@@ -41,5 +43,3 @@ echo "  Resultado"
 echo "======================================="
 echo "Primera solicitud:  ${TIME1}s"
 echo "Segunda solicitud:  ${TIME2}s"
-echo ""
-echo "El edge sirvio el contenido desde cache en la segunda solicitud."
